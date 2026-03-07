@@ -1,0 +1,51 @@
+# Cabal build artifacts
+dist/
+dist-newstyle/
+.cabal-sandbox/
+cabal.sandbox.config
+cabal.project.local
+cabal.project.local~
+.ghc.environment.*
+
+# Stack (if used alongside)
+.stack-work/
+stack.yaml.lock
+
+# GHC
+*.o
+*.hi
+*.hie
+*.dyn_o
+*.dyn_hi
+*.prof
+*.hp
+*.eventlog
+*.tix
+
+# Haskell Language Server
+.hls/
+hie.yaml
+
+# Compiled binaries (adjust to your exe names)
+result
+result-*
+
+# Editor / OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+Thumbs.db
+*~
+*.swp
+*.swo
+.idea/
+.vscode/
+*.orig
+
+# Zed
+.zed/
