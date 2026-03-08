@@ -3,3 +3,4 @@ import Ast
 import Eval
 import Lexer
 import Parser
+import Lookup

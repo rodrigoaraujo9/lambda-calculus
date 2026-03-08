@@ -16,8 +16,12 @@ data Term = Var Ident               -- variables
           | Fix Term                -- fixed-point operator
             deriving Show
 
--- indentifiers are just strings
+-- types
 type Ident = String
+type Env = [(Ident,Value)]
+data Value = Int Int
+  | Closure Term Env
+  deriving Show
 
 -- some syntactical definitions
 -- list of identifiers with free occurrences in a term

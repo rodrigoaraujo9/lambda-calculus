@@ -1,7 +1,5 @@
 module Main where
-import Eval
-import Parser
-import Lexer
+import MyLib
 
 main :: IO ()
 main = do

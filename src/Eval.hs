@@ -35,23 +35,3 @@ eval (Fix t) =
   case eval t of
     Lambda x e -> eval (subst (Fix t) x e)
     _ -> error "fix exception"
-
--- [v/x]e
--- v substitutes x in e
-subst ::  Term -> Ident -> Term -> Term
-subst _ _ (Const c) = Const c
-subst  v x (Var y)
-    | x == y = v
-    | otherwise = Var y
-subst v x (Lambda y e)
-  | x == y = Lambda y e
-  | otherwise = Lambda y (subst v x e)
-subst v x (App e1 e2) = App (subst v x e1) (subst v x e2)
-subst v x (e1 :+ e2) = (subst v x e1) :+ (subst v x e2)
-subst v x (e1 :- e2) = (subst v x e1) :- (subst v x e2)
-subst v x (e1 :* e2) = (subst v x e1) :* (subst v x e2)
-subst v x (IfZero e1 e2 e3) = (IfZero (subst v x e1) (subst v x e2) (subst v x e3))
-subst v x (Let y e1 e2)
-  | x == y    = Let y (subst v x e1) e2
-  | otherwise = Let y (subst v x e1) (subst v x e2)
-subst v x (Fix e) = Fix (subst v x e)
