@@ -3,35 +3,39 @@
 module Eval where
 import Ast
 
-eval :: Term -> Term
-eval (Const n)    = Const n
-eval (Var _)      = error "free variable occurrence"
-eval (Lambda x e) = Lambda x e
-eval (App e1 e2) =
-  let !e1' = eval e1
-      !e2' = eval e2
-  in case e1' of
-    Lambda x e -> eval (subst e2' x e)
-    _ -> error "application exception"
-eval (e1 :+ e2) =
-  case (eval e1, eval e2) of
-    (Const e1', Const e2') -> Const (e1'+e2')
-    _ -> error "type error in :+"
-eval (e1 :- e2) =
-  case (eval e1, eval e2) of
-    (Const e1', Const e2') -> Const (e1'-e2')
-    _ -> error "type error in :-"
-eval (e1 :* e2) =
-  case (eval e1, eval e2) of
-    (Const e1', Const e2') -> Const (e1'*e2')
-    _ -> error "type error in :*"
-eval (IfZero e1 e2 e3) =
-  case eval e1 of
-    Const 0 -> eval e2
-    Const _ -> eval e3
-    _       -> error "type error in ifzero"
-eval (Let x e1 e2) = eval (App (Lambda x e2) e1)
-eval (Fix t) =
-  case eval t of
-    Lambda x e -> eval (subst (Fix t) x e)
-    _ -> error "fix exception"
+eval :: Term -> Env -> Value
+eval (Const n) _ = (Int n)
+eval (Var x) e =
+  case lookup x e of
+    Nothing -> error "free variable occurrence"
+    Just v  -> v
+eval (Lambda x ex) e = Closure (Lambda x ex) e
+eval (App e1 e2) env =
+    let !v1 = eval e1 env
+        !v2 = eval e2 env
+    in case v1 of
+        Closure (Lambda x e) env' -> eval e ((x, v2) : env')
+        _ -> error "first argument didn't evaluate to Closure (Lambda x expression) environment"
+eval (e1 :+ e2) e =
+  case (eval e1 e, eval e2 e) of
+    (Int n1, Int n2) -> Int (n1 + n2)
+    _ -> error "some argument or both didn't evaluate to Int :+"
+eval (e1 :- e2) e =
+    case (eval e1 e, eval e2 e) of
+    (Int n1, Int n2) -> Int (n1 - n2)
+    _ -> error "some argument or both didn't evaluate to Int :-"
+eval (e1 :* e2) e =
+    case (eval e1 e, eval e2 e) of
+    (Int n1, Int n2) -> Int (n1 * n2)
+    _ -> error "some argument or both didn't evaluate to Int :*"
+eval (IfZero e1 e2 e3) e =
+    case (eval e1 e) of
+    Int 0 -> eval e2 e
+    Int _ -> eval e3 e
+    _ -> error "first argument didn't evaluate to Int in IfZero"
+eval (Let x e1 e2) e = eval (App (Lambda x e2) e1) e
+eval (Fix t) env =
+    case eval t env of
+    Closure (Lambda x e) env' ->
+        let v = Closure e ((x,v):env') in v
+    _ -> error "cannot apply non-closure value to fixed point"
