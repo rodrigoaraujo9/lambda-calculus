@@ -33,7 +33,9 @@ eval (IfZero e1 e2 e3) e =
     Int 0 -> eval e2 e
     Int _ -> eval e3 e
     _ -> error "first argument didn't evaluate to Int in IfZero"
-eval (Let x e1 e2) e = eval (App (Lambda x e2) e1) e
+eval (Let x e1 e2) e =
+    let v = eval e1 e in
+    eval e2 ((x,v):e)
 eval (Fix t) env =
     case eval t env of
     Closure (Lambda x e) env' ->
