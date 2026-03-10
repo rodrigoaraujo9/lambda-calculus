@@ -7,4 +7,5 @@ main = do
     input <- getContents
     let term = parse (lexer input)
     print term
-    print (eval term [])
+    -- print (eval term [])
+    print (eval_cps term [] id)

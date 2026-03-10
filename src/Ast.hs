@@ -22,6 +22,7 @@ type Env = [(Ident,Value)]
 data Value = Int Int
   | Closure Term Env
   deriving Show
+type Cont = Value -> Value
 
 -- some syntactical definitions
 -- list of identifiers with free occurrences in a term
