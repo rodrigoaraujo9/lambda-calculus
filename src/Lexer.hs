@@ -12,7 +12,7 @@ lexer ('=':cs)  = TEq      : lexer cs
 lexer ('+':cs)  = TPlus    : lexer cs
 lexer ('-':cs)  = TMinus   : lexer cs
 lexer ('*':cs)  = TTimes   : lexer cs
-lexer ('/':cs)  = TTimes   : lexer cs
+lexer ('/':cs)  = TDivide  : lexer cs
 lexer ('(':cs)  = TLParen  : lexer cs
 lexer (')':cs)  = TRParen  : lexer cs
 lexer ('.':cs)  = TDot     : lexer cs

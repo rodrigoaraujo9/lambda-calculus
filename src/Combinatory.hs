@@ -1,6 +1,8 @@
 module Combinatory where
 
 type Ident = String
+type State = (Comb, Stack)
+type Stack = [Comb] -- is spine
 
 data Op = Add | Sub | Mul | Div
     deriving (Eq, Show)
@@ -19,15 +21,15 @@ data Comb = Var Ident     -- variables
 
 infixl 9 :@
 
-fvComb :: Comb -> [Ident]
-fvComb (Combinatory.Var x) = [x]
-fvComb (p :@ q) = fvComb p ++ fvComb q
-fvComb S = []
-fvComb K = []
-fvComb I = []
-fvComb B = []
-fvComb C = []
-fvComb Y = []
-fvComb (Combinatory.Const _) = []
-fvComb (Prim _) = []
-fvComb Combinatory.IfZero = []
+fv :: Comb -> [Ident]
+fv (Combinatory.Var x) = [x]
+fv (p :@ q) = fv p ++ fv q
+fv S = []
+fv K = []
+fv I = []
+fv B = []
+fv C = []
+fv Y = []
+fv (Combinatory.Const _) = []
+fv (Prim _) = []
+fv Combinatory.IfZero = []

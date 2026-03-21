@@ -20,14 +20,14 @@ lambdaT x (Combinatory.Var y)
     | x == y = I
     | otherwise = K :@ Combinatory.Var y
 lambdaT x c
-    | not (isfreeComb x c) = K :@ c
+    | not (isfree x c) = K :@ c
 lambdaT x (p :@ Combinatory.Var y)
-    | x == y && not (isfreeComb x p) = p
+    | x == y && not (isfree x p) = p
 lambdaT x (p :@ q)
-    | not (isfreeComb x p) = (B :@ p) :@ lambdaT x q
-    | not (isfreeComb x q) = (C :@ lambdaT x p) :@ q
+    | not (isfree x p) = (B :@ p) :@ lambdaT x q
+    | not (isfree x q) = (C :@ lambdaT x p) :@ q
     | otherwise = (S :@ lambdaT x p) :@ lambdaT x q
 lambdaT _ _ = error "*compile time error* unsupported lambda construction"
 
-isfreeComb :: Combinatory.Ident -> Comb -> Bool
-isfreeComb v t = v `elem` fvComb t
+isfree :: Combinatory.Ident -> Comb -> Bool
+isfree v t = v `elem` Combinatory.fv t
