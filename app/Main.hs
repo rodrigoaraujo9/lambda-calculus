@@ -4,10 +4,8 @@ import System.Environment (getArgs)
 
 import Parser
 import Lexer
-
 import Evaluator
 import Compiler
-
 
 main :: IO ()
 main = do
