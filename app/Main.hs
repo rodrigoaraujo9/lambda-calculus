@@ -18,7 +18,7 @@ main = do
             input <- readFile file
             let term   = parse (lexer input)
             let comb   = compile' term
-            let result = eval comb
+            let result = evaluate comb
             putStrLn ""
             putStrLn ""
             putStrLn "*fun!*"

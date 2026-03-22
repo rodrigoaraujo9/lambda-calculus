@@ -2,41 +2,51 @@ module Evaluator where
 
 import Combinatory
 
-eval :: Comb -> Comb
-eval c =
-  case evaluate (c, []) of
+evaluate :: Comb -> Comb
+evaluate c =
+  case executeT (c, []) of
     (result, []) -> result
     (result, xs) -> foldl (:@) result xs
 
-evaluate :: State -> State
-evaluate st =
+executeT :: State -> State
+executeT st =
+  case execute st of
+    Just st' -> executeT st'
+    Nothing  -> st
+
+-- ---->
+execute :: State -> Maybe State
+execute st =
   case unwind st of
     (Prim Add, a:b:xs) ->
-      case (eval a, eval b) of
-        (Const x, Const y) -> evaluate (Const (x + y), xs)
+      case (evaluate a, evaluate b) of
+        (Const x, Const y) -> Just (Const (x + y), xs)
         _ -> error "*runtime error* invalid arguments for addition"
+
     (Prim Sub, a:b:xs) ->
-      case (eval a, eval b) of
-        (Const x, Const y) -> evaluate (Const (x - y), xs)
+      case (evaluate a, evaluate b) of
+        (Const x, Const y) -> Just (Const (x - y), xs)
         _ -> error "*runtime error* invalid arguments for subtraction"
+
     (Prim Mul, a:b:xs) ->
-      case (eval a, eval b) of
-        (Const x, Const y) -> evaluate (Const (x * y), xs)
+      case (evaluate a, evaluate b) of
+        (Const x, Const y) -> Just (Const (x * y), xs)
         _ -> error "*runtime error* invalid arguments for multiplication"
+
     (Prim Div, a:b:xs) ->
-      case (eval a, eval b) of
+      case (evaluate a, evaluate b) of
         (_, Const 0)       -> error "*runtime error* division by zero"
-        (Const x, Const y) -> evaluate (Const (x `div` y), xs)
+        (Const x, Const y) -> Just (Const (x `div` y), xs)
         _ -> error "*runtime error* invalid arguments for division"
+
     (IfZero, c:t1:t2:xs) ->
-      case eval c of
-        Const 0 -> evaluate (t1, xs)
-        Const _ -> evaluate (t2, xs)
+      case evaluate c of
+        Const 0 -> Just (t1, xs)
+        Const _ -> Just (t2, xs)
         _       -> error "*runtime error* invalid condition in ifzero"
+
     st' ->
-      case rewrite st' of
-        Just st'' -> evaluate st''
-        Nothing   -> st'
+      rewrite st'
 
 unwind :: State -> State
 unwind (e1 :@ e2, xs) = unwind (e1, e2 : xs)
