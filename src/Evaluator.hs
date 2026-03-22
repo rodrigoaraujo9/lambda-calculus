@@ -2,9 +2,9 @@ module Evaluator where
 
 import Combinatory
 
-evaluate :: [Comb] -> [Comb]
-evaluate t =
-  case unwind t of
+evaluate :: Stack -> Spine
+evaluate s =
+  case unwind s of
     (Prim Add : a : b : xs) ->
       case (evaluate [a], evaluate [b]) of
         ([Const x], [Const y]) -> evaluate (Const (x + y) : xs)
@@ -27,15 +27,15 @@ evaluate t =
         [Const 0] -> evaluate (t1 : xs)
         [Const _] -> evaluate (t2 : xs)
         _ -> error "*runtime error* invalid condition in ifzero"
-    t'
-      | rewrite t' == t' -> t'
-      | otherwise        -> evaluate (rewrite t')
+    s'
+      | rewrite s' == s' -> s'
+      | otherwise        -> evaluate (rewrite s')
 
-unwind :: [Comb] -> [Comb]
+unwind :: Stack -> Spine
 unwind ((e1 :@ e2): xs) = unwind (e1:e2:xs)
 unwind e = e
 
-rewrite :: [Comb] -> [Comb]
+rewrite :: Spine -> Spine
 rewrite (I:x:xs)     = x:xs
 rewrite (K:p:_:xs)   = p:xs
 rewrite (S:p:q:r:xs) = ((p :@ r) :@ (q :@ r)) : xs
