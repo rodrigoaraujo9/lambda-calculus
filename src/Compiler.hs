@@ -3,7 +3,7 @@ module Compiler where
 import Combinatory
 import Lambda
 
-compile :: Term -> Combinator
+compile :: Term -> Comb
 compile (Lambda.Const c) = Combinatory.Const c
 compile (Lambda.Var x) = Combinatory.Var x
 compile (App e1 e2) = compile e1 :@ compile e2
@@ -16,7 +16,7 @@ compile (Let x e1 e2) = compile (App (Lambda x e2) e1)
 compile (Fix e) = Y :@ compile e
 compile (Lambda.IfZero e1 e2 e3) = (Combinatory.IfZero :@ compile e1) :@ compile e2 :@ compile e3
 
-lambdaT :: Combinatory.Ident -> Combinator -> Combinator
+lambdaT :: Combinatory.Ident -> Comb -> Comb
 lambdaT x (Combinatory.Var y)
     | x == y = I
     | otherwise = K :@ Combinatory.Var y
@@ -28,7 +28,7 @@ lambdaT x (p :@ q)
     | not (isfree x p) = (B :@ p) :@ lambdaT x q
     | not (isfree x q) = (C :@ lambdaT x p) :@ q
     | otherwise = (S :@ lambdaT x p) :@ lambdaT x q
-lambdaT _ _ = error "*compile time error* unsupported lambda construction"
+lambdaT _ _ = error "*compiletime error* unsupported lambda construction"
 
-isfree :: Combinatory.Ident -> Combinator -> Bool
+isfree :: Combinatory.Ident -> Comb -> Bool
 isfree v t = v `elem` Combinatory.fv t

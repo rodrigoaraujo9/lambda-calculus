@@ -3,16 +3,16 @@ module Combinatory where
 import Data.List (union)
 
 type Ident = String
-type State = (Combinator, Stack)
-type Stack = [Combinator]
-type Spine = [Combinator]
+type State = (Comb, Stack)
+type Stack = [Comb]
+type Spine = [Comb]
 
 data Op = Add | Sub | Mul | Div
     deriving (Eq, Show)
 
-data Combinator
+data Comb
     = Var Ident                 -- variables
-    | Combinator :@ Combinator  -- application
+    | Comb :@ Comb              -- application
     | S | K | I                 -- basic combinators
 
     -- extensions
@@ -25,7 +25,7 @@ data Combinator
 
 infixl 9 :@
 
-fv :: Combinator -> [Ident]
+fv :: Comb -> [Ident]
 fv (Var x)  = [x]
 fv (p :@ q) = fv p `union` fv q
 fv _        = []

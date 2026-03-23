@@ -28,7 +28,7 @@ data Term
 fv :: Term -> [Ident]
 fv (Var x)           = [x]
 fv (Lambda x e)      = delete x (fv e)
-fv (App e1 e2)       =  (fv e1) `union` (fv e2)
+fv (App e1 e2)       = (fv e1) `union` (fv e2)
 fv (Const _)         = []
 fv (e1 :+ e2)        = fv e1 `union` fv e2
 fv (e1 :* e2)        = fv e1 `union` fv e2
