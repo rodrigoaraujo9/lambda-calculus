@@ -9,16 +9,16 @@ lexer (c:cs)
     | isSpace c = lexer cs
     | isAlpha c = lexWord (c:cs)
     | isDigit c = lexNum (c:cs)
-lexer ('=':cs)  = TEq        : lexer cs
-lexer ('+':cs)  = TPlus      : lexer cs
-lexer ('-':cs)  = TMinus     : lexer cs
-lexer ('*':cs)  = TTimes     : lexer cs
-lexer ('/':cs)  = TDivide    : lexer cs
-lexer ('(':cs)  = TLParen    : lexer cs
-lexer (')':cs)  = TRParen    : lexer cs
-lexer ('.':cs)  = TDot       : lexer cs
-lexer ('\\':cs) = TBackslash : lexer cs
-lexer (c:_)     = error $ "*lexical error* found unexpected character " ++ [c]
+    | c == '='  = TEq        : lexer cs
+    | c == '+'  = TPlus      : lexer cs
+    | c == '-'  = TMinus     : lexer cs
+    | c == '*'  = TTimes     : lexer cs
+    | c == '/'  = TDivide    : lexer cs
+    | c == '('  = TLParen    : lexer cs
+    | c == ')'  = TRParen    : lexer cs
+    | c == '.'  = TDot       : lexer cs
+    | c == '\\' = TBackslash : lexer cs
+    | otherwise = error $ "*lexical error* found unexpected character " ++ [c]
 
 lexNum :: String -> [Token]
 lexNum cs = TInt (read num) : lexer rest
