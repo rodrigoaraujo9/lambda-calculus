@@ -3,19 +3,32 @@ module Compiler where
 import Combinatory
 import Lambda
 
+-- Compile lambda terms into combinators
 compile :: Term -> Comb
 compile (Lambda.Const c) = Combinatory.Const c
 compile (Lambda.Var x) = Combinatory.Var x
 compile (App e1 e2) = compile e1 :@ compile e2
+
+-- Arithmetic compilation
 compile (e1 Lambda.:+ e2) = (Prim Add :@ compile e1) :@ compile e2
 compile (e1 Lambda.:- e2) = (Prim Sub :@ compile e1) :@ compile e2
 compile (e1 Lambda.:* e2) = (Prim Mul :@ compile e1) :@ compile e2
 compile (e1 Lambda.:/ e2) = (Prim Div :@ compile e1) :@ compile e2
+
+-- Lambda abstraction via bracket abstraction
 compile (Lambda x e) = lambdaT x (compile e)
+
+-- let x = e1 in e2  => (\x -> e2) e1
 compile (Let x e1 e2) = compile (App (Lambda x e2) e1)
+
+-- fix translated using Y combinator
 compile (Fix e) = Y :@ compile e
+
+-- Conditional compilation
 compile (Lambda.IfZero e1 e2 e3) = (Combinatory.IfZero :@ compile e1) :@ compile e2 :@ compile e3
 
+
+-- Bracket abstraction
 lambdaT :: Combinatory.Ident -> Comb -> Comb
 lambdaT x (Combinatory.Var y)
     | x == y = I
@@ -30,5 +43,7 @@ lambdaT x (p :@ q)
     | otherwise = (S :@ lambdaT x p) :@ lambdaT x q
 lambdaT _ _ = error "*compiletime error* unsupported lambda construction"
 
+
+-- Check free variable occurrence
 isfree :: Combinatory.Ident -> Comb -> Bool
 isfree v t = v `elem` Combinatory.fv t

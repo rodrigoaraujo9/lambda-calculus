@@ -3,14 +3,8 @@ module Lambda where
 import Data.List (union, delete)
 
 type Ident = String
-type Env   = [(Ident,Value)]
-type Cont  = Value -> Value
 
-data Value
-    = Int Int
-    | Closure Term Env
-    deriving (Show, Eq)
-
+-- Source language
 data Term
     = Var Ident               -- variables
     | Lambda Ident Term       -- abstraction
@@ -25,6 +19,7 @@ data Term
     | Fix Term                -- fixed-point operator
     deriving (Show, Eq)
 
+-- Free variables of lambda terms
 fv :: Term -> [Ident]
 fv (Var x)           = [x]
 fv (Lambda x e)      = delete x (fv e)

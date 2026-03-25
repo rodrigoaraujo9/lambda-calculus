@@ -3,6 +3,7 @@ module Lexer where
 import Parser (Token(..))
 import Data.Char
 
+-- Convert source text into tokens
 lexer :: String -> [Token]
 lexer [] = []
 lexer (c:cs)
@@ -20,10 +21,12 @@ lexer (c:cs)
     | c == '\\' = TBackslash : lexer cs
     | otherwise = error $ "*lexical error* found unexpected character " ++ [c]
 
+-- Integer token
 lexNum :: String -> [Token]
 lexNum cs = TInt (read num) : lexer rest
     where (num, rest) = span isDigit cs
 
+-- Keywords and identifiers
 lexWord :: String -> [Token]
 lexWord cs = tok : lexer rest
     where

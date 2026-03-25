@@ -3,13 +3,14 @@ module Combinatory where
 import Data.List (union)
 
 type Ident = String
-type State = (Comb, Stack)
 type Stack = [Comb]
 type Spine = [Comb]
 
+-- Primitive arithmetic operations
 data Op = Add | Sub | Mul | Div
     deriving (Eq, Show)
 
+-- Target language
 data Comb
     = Var Ident                 -- variables
     | Comb :@ Comb              -- application
@@ -25,6 +26,7 @@ data Comb
 
 infixl 9 :@
 
+-- Free variables of a combinator expression
 fv :: Comb -> [Ident]
 fv (Var x)  = [x]
 fv (p :@ q) = fv p `union` fv q
